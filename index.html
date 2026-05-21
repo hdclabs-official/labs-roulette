@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>🎯 HDC 랩스 룰렛</title>
+<style>
+  :root {
+    --bg-1: #0f0c29;
+    --bg-2: #302b63;
+    --bg-3: #24243e;
+    --accent: #ffd166;
+    --accent-2: #ef476f;
+    --text: #f5f5f7;
+    --muted: #b8b8c7;
+    --card: rgba(255, 255, 255, 0.06);
+    --border: rgba(255, 255, 255, 0.12);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo", "Segoe UI", Roboto, sans-serif;
+    background: linear-gradient(135deg, var(--bg-1), var(--bg-2), var(--bg-3));
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(circle at 20% 10%, rgba(239, 71, 111, 0.18), transparent 40%),
+      radial-gradient(circle at 80% 90%, rgba(255, 209, 102, 0.15), transparent 45%),
+      radial-gradient(circle at 50% 50%, rgba(118, 120, 237, 0.18), transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 40px;
+  }
+
+  @media (max-width: 900px) {
+    .app { grid-template-columns: 1fr; }
+  }
+
+  header {
+    grid-column: 1 / -1;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+
+  h1 {
+    font-size: clamp(28px, 4vw, 42px);
+    margin: 0 0 8px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    letter-spacing: -0.5px;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    margin: 0;
+    font-size: 14px;
+  }
+
+  /* ============ 룰렛 영역 ============ */
+  .wheel-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .wheel-wrap {
+    position: relative;
+    width: min(520px, 90vw);
+    aspect-ratio: 1 / 1;
+    filter: drop-shadow(0 25px 50px rgba(0,0,0,0.5));
+  }
+
+  .wheel-wrap::before {
+    content: "";
+    position: absolute;
+    inset: -14px;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, #ffd166, #ef476f, #06d6a0, #118ab2, #ffd166);
+    filter: blur(18px);
+    opacity: 0.45;
+    z-index: -1;
+    animation: glow 6s linear infinite;
+  }
+
+  @keyframes glow {
+    to { transform: rotate(360deg); }
+  }
+
+  svg.wheel {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: #1a1a2e;
+    transition: transform 5.5s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+    transform-origin: 50% 50%;
+  }
+
+  .wheel-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #fff, #d0d0d0 60%, #888);
+    transform: translate(-50%, -50%);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.45), inset 0 -3px 6px rgba(0,0,0,0.3);
+    display: grid;
+    place-items: center;
+    font-size: 24px;
+  }
+
+  /* 포인터 (위쪽 화살표) */
+  .pointer {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 18px solid transparent;
+    border-right: 18px solid transparent;
+    border-top: 32px solid var(--accent-2);
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+    z-index: 5;
+  }
+  .pointer::after {
+    content: "";
+    position: absolute;
+    top: -36px;
+    left: -8px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent-2);
+    box-shadow: 0 0 12px rgba(239,71,111,0.7);
+  }
+
+  .spin-btn {
+    padding: 28px 120px;
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #1a1a2e;
+    background: linear-gradient(135deg, var(--accent), #ffb347);
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(255, 209, 102, 0.4);
+    transition: transform 0.15s, box-shadow 0.15s, opacity 0.2s;
+  }
+  .spin-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(255, 209, 102, 0.55);
+  }
+  .spin-btn:active:not(:disabled) { transform: translateY(0); }
+  .spin-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .result-banner {
+    min-height: 56px;
+    padding: 14px 24px;
+    border-radius: 14px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(8px);
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+    transition: transform 0.3s, opacity 0.3s;
+    opacity: 0.7;
+  }
+  .result-banner.win {
+    background: linear-gradient(135deg, rgba(255, 209, 102, 0.25), rgba(239, 71, 111, 0.25));
+    border-color: var(--accent);
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  .result-banner .winner {
+    color: var(--accent);
+    font-size: 22px;
+  }
+
+  /* ============ 입력 패널 ============ */
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 24px;
+    backdrop-filter: blur(12px);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: fit-content;
+  }
+
+  .panel h2 {
+    margin: 0;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .count-badge {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.1);
+    color: var(--muted);
+  }
+
+  .input-row {
+    display: flex;
+    gap: 8px;
+  }
+  .input-row input {
+    flex: 1;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: rgba(0,0,0,0.25);
+    color: var(--text);
+    font-size: 14px;
+    outline: none;
+    transition: border 0.2s;
+  }
+  .input-row input:focus {
+    border-color: var(--accent);
+  }
+  .input-row button {
+    padding: 0 18px;
+    border: none;
+    border-radius: 10px;
+    background: var(--accent);
+    color: #1a1a2e;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .input-row button:hover { background: #ffe08a; }
+
+  .hint {
+    margin: -6px 0 0;
+    font-size: 11.5px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .hint code {
+    background: rgba(255,255,255,0.08);
+    padding: 1px 6px;
+    border-radius: 4px;
+    color: var(--accent);
+    font-size: 11px;
+  }
+
+  .items {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 320px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-right: 4px;
+  }
+  .items::-webkit-scrollbar { width: 6px; }
+  .items::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.2);
+    border-radius: 3px;
+  }
+
+  .item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 8px;
+    font-size: 14px;
+    animation: slidein 0.25s ease;
+  }
+  @keyframes slidein {
+    from { opacity: 0; transform: translateX(-8px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  .item .swatch {
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+  .item .name {
+    flex: 1;
+    word-break: break-all;
+  }
+  .item .weight {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 6px;
+    padding: 2px 4px;
+  }
+  .item .weight button {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 14px;
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    line-height: 1;
+    transition: background 0.15s, color 0.15s;
+  }
+  .item .weight button:hover {
+    color: var(--accent);
+    background: rgba(255,255,255,0.1);
+  }
+  .item .weight .w-val {
+    min-width: 18px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .item .del {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: color 0.15s, background 0.15s;
+  }
+  .item .del:hover {
+    color: var(--accent-2);
+    background: rgba(239, 71, 111, 0.15);
+  }
+
+  .panel-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .panel-actions button {
+    flex: 1;
+    min-width: 100px;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.05);
+    color: var(--text);
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .panel-actions button:hover { background: rgba(255,255,255,0.12); }
+
+  .empty {
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    padding: 16px;
+    font-style: italic;
+  }
+
+  /* ============ 당첨 이력 ============ */
+  .history-section {
+    grid-column: 1 / -1;
+  }
+  .history-panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 24px;
+    backdrop-filter: blur(12px);
+  }
+  .history-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .history-header h2 {
+    margin: 0;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .history-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .history-actions button {
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.05);
+    color: var(--text);
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .history-actions button:hover {
+    background: rgba(255,255,255,0.12);
+  }
+  .history-actions .danger:hover {
+    background: rgba(239,71,111,0.2);
+    border-color: var(--accent-2);
+  }
+  .history-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 8px;
+    max-height: 360px;
+    overflow-y: auto;
+  }
+  .history-list::-webkit-scrollbar { width: 6px; }
+  .history-list::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.2);
+    border-radius: 3px;
+  }
+  .history-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 10px;
+    font-size: 14px;
+    animation: slidein 0.25s ease;
+    transition: border-color 0.15s, transform 0.15s;
+  }
+  .history-item:hover {
+    border-color: var(--accent);
+  }
+  .history-item .hi-icon {
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg, rgba(255,209,102,0.2), rgba(239,71,111,0.2));
+    border-radius: 8px;
+    font-size: 16px;
+  }
+  .history-item .hi-main {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  .history-item .hi-winner {
+    font-weight: 700;
+    color: var(--accent);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .history-item .hi-prize {
+    font-size: 12px;
+    color: var(--text);
+    opacity: 0.85;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .history-item .hi-prize.empty {
+    color: var(--muted);
+    font-style: italic;
+    padding: 0;
+    text-align: left;
+  }
+  .history-item .hi-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+  }
+  .history-item .hi-time {
+    font-size: 11px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .history-item .hi-del {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0;
+    border-radius: 4px;
+    width: 22px;
+    height: 22px;
+    line-height: 1;
+    transition: color 0.15s, background 0.15s;
+  }
+  .history-item .hi-del:hover {
+    color: var(--accent-2);
+    background: rgba(239,71,111,0.15);
+  }
+  .history-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    padding: 24px;
+    font-style: italic;
+  }
+
+  /* ============ 로고 ============ */
+  .logo {
+    position: fixed;
+    top: 20px;
+    left: 24px;
+    z-index: 90;
+    height: 48px;
+    width: auto;
+    user-select: none;
+    pointer-events: none;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+  }
+  .overlay .logo-overlay {
+    position: absolute;
+    top: 24px;
+    left: 28px;
+    height: 56px;
+    width: auto;
+    user-select: none;
+    pointer-events: none;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.5));
+  }
+  @media (max-width: 600px) {
+    .logo { height: 36px; top: 14px; left: 16px; }
+    .overlay .logo-overlay { height: 44px; top: 18px; left: 18px; }
+  }
+
+  /* ============ 상품 입력 ============ */
+  .prize-row {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: center;
+    margin-top: -8px;
+  }
+  .prize-row input {
+    width: min(520px, 90%);
+    padding: 12px 18px;
+    text-align: center;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: rgba(0,0,0,0.25);
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 600;
+    outline: none;
+    transition: border 0.2s, box-shadow 0.2s;
+  }
+  .prize-row input::placeholder { color: var(--muted); font-weight: 400; }
+  .prize-row input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(255,209,102,0.15);
+  }
+
+  /* ============ 컨페티 ============ */
+  .confetti {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 100;
+    overflow: hidden;
+  }
+
+  /* ============ 전체화면 오버레이 ============ */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    padding: 40px 20px;
+    background: radial-gradient(ellipse at center, rgba(15,12,41,0.85), rgba(15,12,41,0.98));
+    backdrop-filter: blur(16px);
+    animation: fadeIn 0.4s ease;
+  }
+  .overlay.active { display: flex; }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .overlay .prize-title {
+    font-size: clamp(22px, 4vw, 36px);
+    font-weight: 800;
+    text-align: center;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    letter-spacing: -0.5px;
+    padding: 0 20px;
+    text-shadow: 0 0 40px rgba(255,209,102,0.3);
+    animation: prizePop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes prizePop {
+    0% { opacity: 0; transform: scale(0.7) translateY(-20px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .overlay .prize-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 4px;
+    margin-bottom: 8px;
+    -webkit-text-fill-color: var(--muted);
+  }
+
+  .overlay .wheel-wrap {
+    width: min(70vmin, 640px);
+    aspect-ratio: 1 / 1;
+  }
+
+  .overlay .overlay-spin-btn {
+    padding: 22px 80px;
+    font-size: 28px;
+  }
+  .overlay .result-banner {
+    font-size: clamp(20px, 3vw, 28px);
+    padding: 18px 32px;
+    min-height: 64px;
+    width: min(520px, 90%);
+  }
+  .overlay .result-banner .winner {
+    font-size: clamp(24px, 3.5vw, 34px);
+  }
+
+  .overlay-close {
+    position: absolute;
+    top: 28px;
+    right: 28px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid var(--border);
+    color: var(--text);
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    font-size: 40px;
+    font-weight: 300;
+    line-height: 1;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+  }
+  .overlay-close:hover:not(:disabled) {
+    background: rgba(239, 71, 111, 0.25);
+    border-color: var(--accent-2);
+    transform: rotate(90deg) scale(1.05);
+    box-shadow: 0 8px 24px rgba(239,71,111,0.35);
+  }
+  .overlay-close:disabled {
+    opacity: 0.25;
+    cursor: not-allowed;
+    transform: none;
+  }
+</style>
+</head>
+<body>
+  <img src="logo.png" alt="HDC 랩스" class="logo" />
+  <div class="app">
+    <header>
+      <h1>🎯 HDC 랩스 룰렛</h1>
+      <p class="subtitle">원하는 만큼 항목을 추가하고, 휠을 돌려보세요</p>
+    </header>
+
+    <!-- 상품명 입력 -->
+    <div class="prize-row">
+      <input type="text" id="prizeInput" placeholder="🎁 상품명을 입력해주세요" maxlength="50" autocomplete="off" />
+    </div>
+
+    <!-- 룰렛 영역 -->
+    <section class="wheel-section">
+      <div class="wheel-wrap" id="wheelWrap">
+        <div class="pointer"></div>
+        <svg class="wheel" id="wheel" viewBox="0 0 400 400"></svg>
+        <!-- <div class="wheel-center">🎯</div> -->
+      </div>
+      <button class="spin-btn" id="spinBtn">돌리기</button>
+    </section>
+
+    <!-- 입력 패널 -->
+    <aside class="panel">
+      <h2>참가자 목록 <span class="count-badge" id="count">0개</span></h2>
+      <form class="input-row" id="addForm">
+        <input type="text" id="nameInput" placeholder="이름 (콤마/줄바꿈으로 여러 개, 가중치: 이름*3)" autocomplete="off" />
+        <button type="submit">추가</button>
+      </form>
+      <p class="hint">콤마/줄바꿈으로 한 번에 추가 · <code>이름*3</code> 형식으로 가중치 지정</p>
+      <ul class="items" id="items"></ul>
+      <div class="panel-actions">
+        <button id="shuffleBtn">🔀 섞기</button>
+        <button id="presetBtn">✨ 예시</button>
+        <button id="clearBtn">🗑️ 비우기</button>
+      </div>
+    </aside>
+
+    <!-- 당첨 이력 -->
+    <section class="history-section">
+      <div class="history-panel">
+        <div class="history-header">
+          <h2>🏆 당첨 이력 <span class="count-badge" id="historyCount">0건</span></h2>
+          <div class="history-actions">
+            <button id="historyExportBtn">📋 복사</button>
+            <button id="historyClearBtn" class="danger">🗑️ 전체 삭제</button>
+          </div>
+        </div>
+        <ul class="history-list" id="historyList"></ul>
+      </div>
+    </section>
+  </div>
+
+  <!-- 전체화면 오버레이 -->
+  <div class="overlay" id="overlay">
+    <img src="logo.png" alt="HDC 랩스" class="logo-overlay" />
+    <button class="overlay-close" id="overlayClose" aria-label="닫기">×</button>
+    <div class="prize-title" id="prizeTitle">
+      <span class="prize-label">PRIZE</span>
+      <span id="prizeTitleText"></span>
+    </div>
+    <div class="wheel-wrap" id="overlayWheelHolder"></div>
+    <button class="spin-btn overlay-spin-btn" id="overlaySpinBtn">돌리기</button>
+    <div class="result-banner" id="overlayResult">준비 완료 — 돌리기를 눌러주세요</div>
+  </div>
+
+  <div class="confetti" id="confetti"></div>
+
+<script>
+(() => {
+  const COLORS = [
+    "#ef476f", "#ffd166", "#06d6a0", "#118ab2", "#9b5de5",
+    "#f15bb5", "#fee440", "#00bbf9", "#f77f00", "#43aa8b",
+    "#e63946", "#a8dadc", "#f4a261", "#bc6c25", "#8338ec"
+  ];
+
+  const wheelEl       = document.getElementById("wheel");
+  const wheelWrap     = document.getElementById("wheelWrap");
+  const itemsEl       = document.getElementById("items");
+  const countEl       = document.getElementById("count");
+  const inputEl       = document.getElementById("nameInput");
+  const addForm       = document.getElementById("addForm");
+  const spinBtn       = document.getElementById("spinBtn");
+  // 메인 결과 배너는 마크업에서 제거되었을 수 있음 → null-safe 노옵 객체로 대체
+  const resultEl      = document.getElementById("result") || {
+    classList: { add() {}, remove() {}, contains() { return false; } },
+    set textContent(_) {}, get textContent() { return ""; },
+    set innerHTML(_) {}, get innerHTML() { return ""; },
+  };
+  const clearBtn      = document.getElementById("clearBtn");
+  const shuffleBtn    = document.getElementById("shuffleBtn");
+  const presetBtn     = document.getElementById("presetBtn");
+  const confettiEl    = document.getElementById("confetti");
+  const prizeInput    = document.getElementById("prizeInput");
+  const overlayEl     = document.getElementById("overlay");
+  const overlayClose  = document.getElementById("overlayClose");
+  const overlayResult = document.getElementById("overlayResult");
+  const overlaySpinBtn= document.getElementById("overlaySpinBtn");
+  const overlayHolder = document.getElementById("overlayWheelHolder");
+  const prizeTitleEl  = document.getElementById("prizeTitle");
+  const prizeTitleText= document.getElementById("prizeTitleText");
+  const historyListEl = document.getElementById("historyList");
+  const historyCountEl= document.getElementById("historyCount");
+  const historyClearBtn = document.getElementById("historyClearBtn");
+  const historyExportBtn= document.getElementById("historyExportBtn");
+
+  // 상품명 복원
+  prizeInput.value = localStorage.getItem("roulette_prize") || "";
+  prizeInput.addEventListener("input", () => {
+    localStorage.setItem("roulette_prize", prizeInput.value);
+  });
+
+  // 마이그레이션: 기존 string[] → {name, weight}[]
+  let entries = (() => {
+    try {
+      const raw = JSON.parse(localStorage.getItem("roulette_names") || "[]");
+      return raw.map(e => typeof e === "string" ? { name: e, weight: 1 } : { name: String(e.name), weight: Math.max(1, Number(e.weight) || 1) });
+    } catch { return []; }
+  })();
+  let history = (() => {
+    try { return JSON.parse(localStorage.getItem("roulette_history") || "[]"); }
+    catch { return []; }
+  })();
+  let rotation = 0;
+  let spinning = false;
+
+  const save = () => localStorage.setItem("roulette_names", JSON.stringify(entries));
+  const saveHistory = () => localStorage.setItem("roulette_history", JSON.stringify(history));
+  const colorOf = (i) => COLORS[i % COLORS.length];
+  const totalWeight = () => entries.reduce((s, e) => s + e.weight, 0);
+
+  function render() {
+    countEl.textContent = `${entries.length}개`;
+    renderItems();
+    renderWheel();
+    renderHistory();
+    spinBtn.disabled = entries.length < 2 || spinning;
+  }
+
+  function formatTime(ts) {
+    const d = new Date(ts);
+    const now = new Date();
+    const sameDay = d.toDateString() === now.toDateString();
+    const pad = (n) => String(n).padStart(2, "0");
+    const hm = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    if (sameDay) return `오늘 ${hm}`;
+    return `${d.getMonth() + 1}/${d.getDate()} ${hm}`;
+  }
+
+  function renderHistory() {
+    historyCountEl.textContent = `${history.length}건`;
+    historyListEl.innerHTML = "";
+    if (history.length === 0) {
+      const li = document.createElement("li");
+      li.className = "history-empty";
+      li.textContent = "아직 당첨 이력이 없습니다";
+      historyListEl.appendChild(li);
+      return;
+    }
+    history.forEach((h) => {
+      const li = document.createElement("li");
+      li.className = "history-item";
+      li.innerHTML = `
+        <span class="hi-icon">🏆</span>
+        <span class="hi-main">
+          <span class="hi-winner"></span>
+          <span class="hi-prize"></span>
+        </span>
+        <span class="hi-meta">
+          <span class="hi-time"></span>
+          <button class="hi-del" aria-label="삭제">×</button>
+        </span>
+      `;
+      li.querySelector(".hi-winner").textContent = h.winner;
+      const prizeEl = li.querySelector(".hi-prize");
+      if (h.prize) {
+        prizeEl.textContent = `🎁 ${h.prize}`;
+      } else {
+        prizeEl.textContent = "(상품명 없음)";
+        prizeEl.classList.add("empty");
+      }
+      li.querySelector(".hi-time").textContent = formatTime(h.ts);
+      li.querySelector(".hi-del").addEventListener("click", () => removeHistoryAt(h.id));
+      historyListEl.appendChild(li);
+    });
+  }
+
+  function addHistory(winner, prize) {
+    history.unshift({
+      id: Date.now() + "-" + Math.random().toString(36).slice(2, 8),
+      winner,
+      prize: prize || "",
+      ts: Date.now()
+    });
+    if (history.length > 200) history = history.slice(0, 200);
+    saveHistory();
+    renderHistory();
+  }
+
+  function removeHistoryAt(id) {
+    history = history.filter(h => h.id !== id);
+    saveHistory();
+    renderHistory();
+  }
+
+  function renderItems() {
+    // replaceChildren로 강제 DOM 교체 (innerHTML보다 확실)
+    while (itemsEl.firstChild) itemsEl.removeChild(itemsEl.firstChild);
+    if (entries.length === 0) {
+      const li = document.createElement("li");
+      li.className = "empty";
+      li.textContent = "아직 항목이 없습니다";
+      itemsEl.appendChild(li);
+      return;
+    }
+    entries.forEach((entry, i) => {
+      const li = document.createElement("li");
+      li.className = "item";
+      li.innerHTML = `
+        <span class="swatch" style="background:${colorOf(i)}"></span>
+        <span class="name"></span>
+        <span class="weight">
+          <button class="w-dec" aria-label="가중치 감소">−</button>
+          <span class="w-val"></span>
+          <button class="w-inc" aria-label="가중치 증가">+</button>
+        </span>
+        <button class="del" aria-label="삭제">×</button>
+      `;
+      li.querySelector(".name").textContent = entry.name;
+      li.querySelector(".w-val").textContent = `×${entry.weight}`;
+      li.querySelector(".w-inc").addEventListener("click", () => changeWeight(i, +1));
+      li.querySelector(".w-dec").addEventListener("click", () => changeWeight(i, -1));
+      li.querySelector(".del").addEventListener("click", () => removeAt(i));
+      itemsEl.appendChild(li);
+    });
+  }
+
+  function renderWheel() {
+    wheelEl.innerHTML = "";
+    const cx = 200, cy = 200, r = 196;
+
+    if (entries.length === 0) {
+      const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      circle.setAttribute("cx", cx);
+      circle.setAttribute("cy", cy);
+      circle.setAttribute("r", r);
+      circle.setAttribute("fill", "#2a2a4a");
+      wheelEl.appendChild(circle);
+      const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      text.setAttribute("x", cx);
+      text.setAttribute("y", cy);
+      text.setAttribute("text-anchor", "middle");
+      text.setAttribute("dominant-baseline", "middle");
+      text.setAttribute("fill", "#888");
+      text.setAttribute("font-size", "20");
+      wheelEl.appendChild(text);
+      return;
+    }
+
+    if (entries.length === 1) {
+      const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      circle.setAttribute("cx", cx);
+      circle.setAttribute("cy", cy);
+      circle.setAttribute("r", r);
+      circle.setAttribute("fill", colorOf(0));
+      wheelEl.appendChild(circle);
+      addLabel(cx, cy - r / 2, entries[0].name, 0);
+      return;
+    }
+
+    const total = totalWeight();
+    let cursor = -Math.PI / 2; // 12시 방향에서 시작
+
+    entries.forEach((entry, i) => {
+      const slice = (entry.weight / total) * 2 * Math.PI;
+      const start = cursor;
+      const end = cursor + slice;
+      const x1 = cx + r * Math.cos(start);
+      const y1 = cy + r * Math.sin(start);
+      const x2 = cx + r * Math.cos(end);
+      const y2 = cy + r * Math.sin(end);
+      const largeArc = slice > Math.PI ? 1 : 0;
+
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("d", `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2} Z`);
+      path.setAttribute("fill", colorOf(i));
+      path.setAttribute("stroke", "rgba(0,0,0,0.25)");
+      path.setAttribute("stroke-width", "1");
+      wheelEl.appendChild(path);
+
+      const midAngle = start + slice / 2;
+      const labelR = r * 0.65;
+      const lx = cx + labelR * Math.cos(midAngle);
+      const ly = cy + labelR * Math.sin(midAngle);
+      const rotateDeg = (midAngle * 180) / Math.PI + 90;
+      const label = entry.weight > 1 ? `${entry.name} ×${entry.weight}` : entry.name;
+      addLabel(lx, ly, label, rotateDeg, slice);
+
+      cursor = end;
+    });
+
+    const ring = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    ring.setAttribute("cx", cx);
+    ring.setAttribute("cy", cy);
+    ring.setAttribute("r", r);
+    ring.setAttribute("fill", "none");
+    ring.setAttribute("stroke", "rgba(255,255,255,0.15)");
+    ring.setAttribute("stroke-width", "2");
+    wheelEl.appendChild(ring);
+  }
+
+  function addLabel(x, y, text, rotateDeg, sliceRad = Math.PI) {
+    const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    t.setAttribute("x", x);
+    t.setAttribute("y", y);
+    t.setAttribute("text-anchor", "middle");
+    t.setAttribute("dominant-baseline", "middle");
+    t.setAttribute("fill", "#fff");
+    t.setAttribute("font-weight", "700");
+    // 슬라이스 각도에 따라 폰트/길이 동적 조정
+    const sliceDeg = (sliceRad * 180) / Math.PI;
+    const fontSize = sliceDeg < 15 ? 10 : sliceDeg < 25 ? 12 : sliceDeg < 40 ? 14 : 16;
+    t.setAttribute("font-size", fontSize);
+    t.setAttribute("transform", `rotate(${rotateDeg}, ${x}, ${y})`);
+    t.style.pointerEvents = "none";
+    t.style.textShadow = "0 1px 2px rgba(0,0,0,0.6)";
+    const maxChars = sliceDeg < 15 ? 5 : sliceDeg < 25 ? 7 : sliceDeg < 40 ? 9 : 12;
+    t.textContent = text.length > maxChars ? text.slice(0, maxChars - 1) + "…" : text;
+    wheelEl.appendChild(t);
+  }
+
+  // "김민준, 이서연*3, 박지호" / 줄바꿈 혼합 파싱
+  function parseInput(raw) {
+    const tokens = raw.split(/[,\n]+/);
+    const parsed = [];
+    for (const tok of tokens) {
+      const s = tok.trim();
+      if (!s) continue;
+      // 이름*가중치
+      const m = s.match(/^(.+?)\s*[*xX×]\s*(\d+)$/);
+      if (m) {
+        const name = m[1].trim();
+        const w = Math.min(99, Math.max(1, parseInt(m[2], 10) || 1));
+        if (name) parsed.push({ name, weight: w });
+      } else {
+        parsed.push({ name: s, weight: 1 });
+      }
+    }
+    return parsed;
+  }
+
+  function addName(raw) {
+    const parsed = parseInput(raw);
+    if (parsed.length === 0) return;
+    // 같은 이름이 이미 있으면 가중치 합산
+    for (const p of parsed) {
+      const existing = entries.find(e => e.name === p.name);
+      if (existing) existing.weight = Math.min(99, existing.weight + p.weight);
+      else entries.push(p);
+    }
+    save();
+    render();
+  }
+
+  function removeAt(i) {
+    if (spinning) return;
+    entries.splice(i, 1);
+    save();
+    render();
+  }
+
+  function changeWeight(i, delta) {
+    if (spinning) return;
+    const next = entries[i].weight + delta;
+    if (next < 1 || next > 99) return;
+    entries[i].weight = next;
+    save();
+    render();
+  }
+
+  function openOverlay() {
+    const prize = prizeInput.value.trim();
+    if (prize) {
+      prizeTitleText.textContent = prize;
+      prizeTitleEl.style.display = "";
+    } else {
+      prizeTitleEl.style.display = "none";
+    }
+    overlayHolder.appendChild(wheelWrap);
+    overlayResult.classList.remove("win");
+    overlayResult.textContent = "준비 완료 — 돌리기를 눌러주세요";
+    overlayEl.classList.add("active");
+    overlayClose.disabled = false;
+    overlaySpinBtn.style.display = "";
+    overlaySpinBtn.disabled = false;
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeOverlay() {
+    if (spinning) return;
+    const wheelSection = document.querySelector(".wheel-section");
+    wheelSection.insertBefore(wheelWrap, wheelSection.firstChild);
+    overlayEl.classList.remove("active");
+    document.body.style.overflow = "";
+    if (overlayResult.classList.contains("win")) {
+      resultEl.classList.add("win");
+      resultEl.innerHTML = overlayResult.innerHTML;
+    }
+  }
+
+  // 1단계: 메인 '돌리기' → 오버레이만 열기
+  function prepareSpin() {
+    if (spinning || entries.length < 2) return;
+    openOverlay();
+  }
+
+  // 2단계: 오버레이의 '돌리기' → 실제 회전
+  function doSpin() {
+    if (spinning || entries.length < 2) return;
+    spinning = true;
+    spinBtn.disabled = true;
+    overlaySpinBtn.disabled = true;
+    overlayClose.disabled = true;
+    overlaySpinBtn.style.display = "none";
+    resultEl.classList.remove("win");
+    overlayResult.classList.remove("win");
+    overlayResult.textContent = "돌리는 중...";
+
+    const total = totalWeight();
+    const roll = Math.random() * total;
+    let acc = 0;
+    let winnerIndex = 0;
+    for (let i = 0; i < entries.length; i++) {
+      acc += entries[i].weight;
+      if (roll < acc) { winnerIndex = i; break; }
+    }
+
+    const sliceDeg = entries.map(e => (e.weight / total) * 360);
+    let startDeg = 0;
+    for (let i = 0; i < winnerIndex; i++) startDeg += sliceDeg[i];
+    const centerDeg = startDeg + sliceDeg[winnerIndex] / 2;
+    const jitter = (Math.random() - 0.5) * sliceDeg[winnerIndex] * 0.8;
+    const targetAngle = -centerDeg + jitter;
+    const turns = 6 + Math.floor(Math.random() * 3);
+
+    const currentMod = ((rotation % 360) + 360) % 360;
+    rotation = rotation - currentMod + turns * 360 + targetAngle;
+
+    requestAnimationFrame(() => {
+      wheelEl.style.transition = "transform 5.5s cubic-bezier(0.17, 0.67, 0.12, 0.99)";
+      wheelEl.style.transform = `rotate(${rotation}deg)`;
+    });
+
+    const onEnd = () => {
+      wheelEl.removeEventListener("transitionend", onEnd);
+      spinning = false;
+      spinBtn.disabled = false;
+      overlayClose.disabled = false;
+      const winner = entries[winnerIndex].name;
+      const prize = prizeInput.value.trim();
+      const prizeText = prize ? `<span class="winner">${escapeHtml(winner)}</span> 님이 ${escapeHtml(prize)} 당첨!` : `🎉 당첨 <span class="winner">${escapeHtml(winner)}</span> 🎉`;
+      overlayResult.classList.add("win");
+      overlayResult.innerHTML = prizeText;
+      resultEl.classList.add("win");
+      resultEl.innerHTML = prizeText;
+      addHistory(winner, prize);
+      fireConfetti();
+    };
+    wheelEl.addEventListener("transitionend", onEnd);
+  }
+
+  function escapeHtml(s) {
+    return s.replace(/[&<>"']/g, c => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    })[c]);
+  }
+
+  // 컨페티
+  function fireConfetti() {
+    const n = 80;
+    for (let i = 0; i < n; i++) {
+      const piece = document.createElement("div");
+      const size = 6 + Math.random() * 8;
+      piece.style.cssText = `
+        position: absolute;
+        top: -20px;
+        left: ${Math.random() * 100}%;
+        width: ${size}px;
+        height: ${size * 0.4}px;
+        background: ${COLORS[Math.floor(Math.random() * COLORS.length)]};
+        opacity: ${0.7 + Math.random() * 0.3};
+        transform: rotate(${Math.random() * 360}deg);
+        border-radius: 2px;
+      `;
+      confettiEl.appendChild(piece);
+
+      const duration = 2500 + Math.random() * 2000;
+      const drift = (Math.random() - 0.5) * 300;
+      piece.animate([
+        { transform: `translate(0, 0) rotate(0deg)`, opacity: 1 },
+        { transform: `translate(${drift}px, ${window.innerHeight + 40}px) rotate(${720 + Math.random() * 720}deg)`, opacity: 0 }
+      ], {
+        duration,
+        easing: "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+        fill: "forwards"
+      }).onfinish = () => piece.remove();
+    }
+  }
+
+  // 이벤트
+  addForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    addName(inputEl.value);
+    inputEl.value = "";
+    inputEl.focus();
+  });
+
+  spinBtn.addEventListener("click", prepareSpin);
+  overlaySpinBtn.addEventListener("click", doSpin);
+
+  overlayClose.addEventListener("click", closeOverlay);
+  // 배경 클릭/ESC로는 닫히지 않음 — 오로지 X 버튼만
+
+  historyClearBtn.addEventListener("click", () => {
+    if (history.length === 0) return;
+    if (!confirm(`당첨 이력 ${history.length}건을 모두 삭제하시겠습니까?`)) return;
+    history = [];
+    saveHistory();
+    renderHistory();
+  });
+
+  historyExportBtn.addEventListener("click", async () => {
+    if (history.length === 0) {
+      alert("복사할 이력이 없습니다");
+      return;
+    }
+    const lines = history.map(h => {
+      const t = new Date(h.ts).toLocaleString("ko-KR");
+      const prize = h.prize ? ` / ${h.prize}` : "";
+      return `[${t}] ${h.winner}${prize}`;
+    });
+    const text = lines.join("\n");
+    try {
+      await navigator.clipboard.writeText(text);
+      const orig = historyExportBtn.textContent;
+      historyExportBtn.textContent = "✅ 복사됨";
+      setTimeout(() => { historyExportBtn.textContent = orig; }, 1500);
+    } catch {
+      // fallback
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      ta.remove();
+      alert("복사되었습니다");
+    }
+  });
+
+  clearBtn.addEventListener("click", () => {
+    if (spinning) return;
+    if (entries.length === 0) return;
+    if (!confirm("정말 모두 삭제하시겠습니까?")) return;
+    // confirm 모달이 닫힌 직후의 렌더 타이밍 회피 위해 다음 task로 미룸
+    setTimeout(() => {
+      entries.length = 0; // 배열 재할당 대신 in-place 비우기로 참조 유지
+      save();
+      rotation = 0;
+      wheelEl.style.transition = "none";
+      wheelEl.style.transform = "rotate(0deg)";
+      requestAnimationFrame(() => {
+        wheelEl.style.transition = "";
+      });
+      resultEl.classList.remove("win");
+      resultEl.textContent = "항목을 2개 이상 추가하고 SPIN을 눌러보세요";
+      render();
+    }, 0);
+  });
+
+  shuffleBtn.addEventListener("click", () => {
+    if (spinning || entries.length < 2) return;
+    for (let i = entries.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [entries[i], entries[j]] = [entries[j], entries[i]];
+    }
+    save();
+    render();
+  });
+
+  presetBtn.addEventListener("click", () => {
+    if (spinning) return;
+    const preset = ["최진경", "김경은", "김난영", "김도연", "김성민", "신정훈", "이영주", "최상은", "최은지"];
+    const existingNames = new Set(entries.map(e => e.name));
+    for (const name of preset) {
+      if (!existingNames.has(name)) entries.push({ name, weight: 1 });
+    }
+    save();
+    render();
+  });
+
+  // 초기 렌더
+  render();
+})();
+</script>
+</body>
+</html>
