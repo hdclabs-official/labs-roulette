@@ -60,6 +60,7 @@
     grid-column: 1 / -1;
     text-align: center;
     margin-bottom: 8px;
+    padding-top: 32px;
   }
 
   h1 {
@@ -623,6 +624,7 @@
     animation: fadeIn 0.4s ease;
   }
   .overlay.active { display: flex; }
+  body.overlay-open .logo { display: none; }
   @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
@@ -710,7 +712,6 @@
   <img src="logo.png" alt="HDC 랩스" class="logo" />
   <div class="app">
     <header>
-      <h1>🎯 HDC 랩스 룰렛</h1>
       <p class="subtitle">원하는 만큼 항목을 추가하고, 휠을 돌려보세요</p>
     </header>
 
@@ -1103,6 +1104,7 @@
     overlaySpinBtn.style.display = "";
     overlaySpinBtn.disabled = false;
     document.body.style.overflow = "hidden";
+    document.body.classList.add("overlay-open");
   }
 
   function closeOverlay() {
@@ -1111,6 +1113,7 @@
     wheelSection.insertBefore(wheelWrap, wheelSection.firstChild);
     overlayEl.classList.remove("active");
     document.body.style.overflow = "";
+    document.body.classList.remove("overlay-open");
     if (overlayResult.classList.contains("win")) {
       resultEl.classList.add("win");
       resultEl.innerHTML = overlayResult.innerHTML;
