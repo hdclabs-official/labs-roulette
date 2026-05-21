@@ -573,18 +573,22 @@
     .overlay .logo-overlay { height: 44px; top: 18px; left: 18px; }
   }
 
-  /* ============ 상품 입력 ============ */
-  .prize-row {
-    grid-column: 1 / -1;
+  /* ============ 우측 카드 스택 ============ */
+  .side-stack {
     display: flex;
-    justify-content: center;
-    margin-top: -8px;
+    flex-direction: column;
+    gap: 20px;
+    height: fit-content;
   }
-  .prize-row input {
-    width: min(520px, 90%);
-    padding: 12px 18px;
-    text-align: center;
-    border-radius: 999px;
+
+  /* ============ 상품 카드 ============ */
+  .prize-panel {
+    gap: 12px;
+  }
+  .prize-field {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 10px;
     border: 1px solid var(--border);
     background: rgba(0,0,0,0.25);
     color: var(--text);
@@ -593,8 +597,8 @@
     outline: none;
     transition: border 0.2s, box-shadow 0.2s;
   }
-  .prize-row input::placeholder { color: var(--muted); font-weight: 400; }
-  .prize-row input:focus {
+  .prize-field::placeholder { color: var(--muted); font-weight: 400; }
+  .prize-field:focus {
     border-color: var(--accent);
     box-shadow: 0 0 0 3px rgba(255,209,102,0.15);
   }
@@ -715,11 +719,6 @@
       <p class="subtitle">원하는 만큼 항목을 추가하고, 휠을 돌려보세요</p>
     </header>
 
-    <!-- 상품명 입력 -->
-    <div class="prize-row">
-      <input type="text" id="prizeInput" placeholder="🎁 상품명을 입력해주세요" maxlength="50" autocomplete="off" />
-    </div>
-
     <!-- 룰렛 영역 -->
     <section class="wheel-section">
       <div class="wheel-wrap" id="wheelWrap">
@@ -730,8 +729,16 @@
       <button class="spin-btn" id="spinBtn">돌리기</button>
     </section>
 
-    <!-- 입력 패널 -->
-    <aside class="panel">
+    <!-- 우측 패널: 상품 + 참가자 -->
+    <div class="side-stack">
+      <!-- 상품명 카드 -->
+      <aside class="panel prize-panel">
+        <h2>🎁 상품</h2>
+        <input type="text" id="prizeInput" class="prize-field" placeholder="상품명을 입력해주세요 (예: 스타벅스 아메리카노)" maxlength="50" autocomplete="off" />
+      </aside>
+
+      <!-- 참가자 패널 -->
+      <aside class="panel">
       <h2>참가자 목록 <span class="count-badge" id="count">0개</span></h2>
       <form class="input-row" id="addForm">
         <input type="text" id="nameInput" placeholder="이름 (콤마/줄바꿈으로 여러 개, 가중치: 이름*3)" autocomplete="off" />
@@ -744,7 +751,8 @@
         <button id="presetBtn">✨ 예시</button>
         <button id="clearBtn">🗑️ 비우기</button>
       </div>
-    </aside>
+      </aside>
+    </div>
 
     <!-- 당첨 이력 -->
     <section class="history-section">
