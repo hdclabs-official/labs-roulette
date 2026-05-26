@@ -1,0 +1,109 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - heading "HDC랩스 룰렛" [level=1] [ref=e4]
+    - button "돌리기" [disabled] [ref=e18]
+    - generic [ref=e19]:
+      - complementary [ref=e20]:
+        - heading "🎁 상품" [level=2] [ref=e21]
+        - textbox "상품명을 입력해주세요" [ref=e22]: 테스트 상품
+      - complementary [ref=e23]:
+        - heading "참가자 목록 8개" [level=2] [ref=e24]:
+          - text: 참가자 목록
+          - generic [ref=e25]: 8개
+        - generic [ref=e26]:
+          - 'textbox "이름 (콤마/줄바꿈으로 여러 개, 가중치: 이름*3)" [ref=e27]'
+          - button "추가" [ref=e28] [cursor=pointer]
+        - list [ref=e29]:
+          - listitem [ref=e30]:
+            - generic [ref=e32]: 상품1
+            - generic [ref=e33]:
+              - button "가중치 감소" [ref=e34] [cursor=pointer]: −
+              - generic [ref=e35]: ×1
+              - button "가중치 증가" [ref=e36] [cursor=pointer]: +
+            - button "삭제" [ref=e37] [cursor=pointer]: ×
+          - listitem [ref=e38]:
+            - generic [ref=e40]: 상품2
+            - generic [ref=e41]:
+              - button "가중치 감소" [ref=e42] [cursor=pointer]: −
+              - generic [ref=e43]: ×1
+              - button "가중치 증가" [ref=e44] [cursor=pointer]: +
+            - button "삭제" [ref=e45] [cursor=pointer]: ×
+          - listitem [ref=e46]:
+            - generic [ref=e48]: 상품3
+            - generic [ref=e49]:
+              - button "가중치 감소" [ref=e50] [cursor=pointer]: −
+              - generic [ref=e51]: ×1
+              - button "가중치 증가" [ref=e52] [cursor=pointer]: +
+            - button "삭제" [ref=e53] [cursor=pointer]: ×
+          - listitem [ref=e54]:
+            - generic [ref=e56]: 상품4
+            - generic [ref=e57]:
+              - button "가중치 감소" [ref=e58] [cursor=pointer]: −
+              - generic [ref=e59]: ×1
+              - button "가중치 증가" [ref=e60] [cursor=pointer]: +
+            - button "삭제" [ref=e61] [cursor=pointer]: ×
+          - listitem [ref=e62]:
+            - generic [ref=e64]: 상품5
+            - generic [ref=e65]:
+              - button "가중치 감소" [ref=e66] [cursor=pointer]: −
+              - generic [ref=e67]: ×1
+              - button "가중치 증가" [ref=e68] [cursor=pointer]: +
+            - button "삭제" [ref=e69] [cursor=pointer]: ×
+          - listitem [ref=e70]:
+            - generic [ref=e72]: 상품6
+            - generic [ref=e73]:
+              - button "가중치 감소" [ref=e74] [cursor=pointer]: −
+              - generic [ref=e75]: ×1
+              - button "가중치 증가" [ref=e76] [cursor=pointer]: +
+            - button "삭제" [ref=e77] [cursor=pointer]: ×
+          - listitem [ref=e78]:
+            - generic [ref=e80]: 상품7
+            - generic [ref=e81]:
+              - button "가중치 감소" [ref=e82] [cursor=pointer]: −
+              - generic [ref=e83]: ×1
+              - button "가중치 증가" [ref=e84] [cursor=pointer]: +
+            - button "삭제" [ref=e85] [cursor=pointer]: ×
+          - listitem [ref=e86]:
+            - generic [ref=e88]: 상품8
+            - generic [ref=e89]:
+              - button "가중치 감소" [ref=e90] [cursor=pointer]: −
+              - generic [ref=e91]: ×1
+              - button "가중치 증가" [ref=e92] [cursor=pointer]: +
+            - button "삭제" [ref=e93] [cursor=pointer]: ×
+        - generic [ref=e94]:
+          - button "🔀 섞기" [ref=e95] [cursor=pointer]
+          - button "🗑️ 비우기" [ref=e96] [cursor=pointer]
+    - generic [ref=e98]:
+      - generic [ref=e99]:
+        - heading "🏆 당첨 이력 1건" [level=2] [ref=e100]:
+          - text: 🏆 당첨 이력
+          - generic [ref=e101]: 1건
+        - generic [ref=e102]:
+          - button "📋 복사" [ref=e103] [cursor=pointer]
+          - button "🗑️ 전체 삭제" [ref=e104] [cursor=pointer]
+      - list [ref=e105]:
+        - listitem [ref=e106]:
+          - generic [ref=e107]: 🏆
+          - generic [ref=e108]:
+            - generic [ref=e109]: 상품6
+            - generic [ref=e110]: 🎁 테스트 상품
+          - generic [ref=e111]:
+            - generic [ref=e112]: 오늘 09:30
+            - button "삭제" [ref=e113] [cursor=pointer]: ×
+  - generic [ref=e114]:
+    - img "HDC 랩스"
+    - button "닫기" [disabled] [ref=e115]: ×
+    - generic [ref=e116]:
+      - generic [ref=e117]: PRIZE
+      - text: 테스트 상품
+    - img [ref=e8]:
+      - generic: 상품1
+      - generic: 상품2
+      - generic: 상품3
+      - generic: 상품4
+      - generic: 상품5
+      - generic: 상품6
+      - generic: 상품7
+      - generic: 상품8
+    - generic [ref=e120]: 돌리는 중...

@@ -1,0 +1,32 @@
+- generic [active] [ref=e1]:
+  - img "HDC 랩스"
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - heading "HDC랩스 룰렛" [level=1] [ref=e4]
+    - generic [ref=e5]:
+      - img [ref=e8]
+      - button "돌리기" [ref=e9] [cursor=pointer]
+    - generic [ref=e10]:
+      - complementary [ref=e11]:
+        - heading "🎁 상품" [level=2] [ref=e12]
+        - textbox "상품명을 입력해주세요" [ref=e13]
+      - complementary [ref=e14]:
+        - heading "참가자 목록 0명" [level=2] [ref=e15]:
+          - text: 참가자 목록
+          - generic [ref=e16]: 0명
+        - generic [ref=e17]:
+          - 'textbox "이름 (콤마/줄바꿈으로 여러 개, 가중치: 이름*3)" [ref=e18]'
+          - button "추가" [ref=e19] [cursor=pointer]
+        - list
+        - generic [ref=e20]:
+          - button "🔀 섞기" [ref=e21] [cursor=pointer]
+          - button "🗑️ 비우기" [ref=e22] [cursor=pointer]
+    - generic [ref=e24]:
+      - generic [ref=e25]:
+        - heading "🏆 당첨 이력 0건" [level=2] [ref=e26]:
+          - text: 🏆 당첨 이력
+          - generic [ref=e27]: 0건
+        - generic [ref=e28]:
+          - button "📋 복사" [ref=e29] [cursor=pointer]
+          - button "🗑️ 전체 삭제" [ref=e30] [cursor=pointer]
+      - list
